@@ -1,0 +1,48 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    
+<div class="container">
+
+    <h2 class="mb-4">Active Listings</h2>
+    <div class="row g-4">
+    {% for listing, price in active_listings %}
+        <div class="col-12 col-md-6 col-xl-4 ">
+        <div class="card">
+            <img src="{{ listing.image_url }}" alt="Listng picture" class="card-img-top" style="height: 250px; object-fit: cover;">
+        
+            <div class="card-body">
+                    <h5 class="card-title">{{ listing.title }}</h5>
+                    <p class="card-text">{{ listing.description }}</p>
+            </div>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">
+                    <strong>Owner:</strong> {{ listing.owner }}
+                </li>
+                <li class="list-group-item">
+                    <strong>Price:</strong> ${{ price }}
+                </li>
+                <li class="list-group-item">
+                    <strong>Category:</strong> {{ listing.category | title }}
+                </li>
+
+                <li class="list-group-item">
+                    <strong>Active:</strong> {{ listing.active }}
+                </li>
+                <li class="list-group-item">
+                    <strong>Date:</strong> {{ listing.date }}
+                </li>
+                <li class="list-group-item p-3 d-flex justify-content-start">
+                    <a href="{% url 'view_listing' listing.id %}" class="btn btn-primary">View Listing</a>
+                </li>
+              </ul>
+            
+        </div>
+        
+        </div>
+    {% endfor %}
+
+    </div>
+  </div>
+
+{% endblock %}

@@ -1,0 +1,182 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+
+    <div class="container py-5">
+
+        <div class="row">
+            <div class="col-12">
+                <h2 class="fs-2 mb-3 mb-md-0">Seller: {{listing.owner}}</h2>
+            </div>
+        </div>
+
+        <!-- Listing Header -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="d-md-flex justify-content-between align-items-center">
+                    <h1 class="fs-2 mb-3 mb-md-0">Listing: {{ listing.title }}</h1>
+                    {% if isInWatchList %}
+                    <form method="post" action="{% url 'remove_watch_list' %}">
+                        {% csrf_token %}
+                        <input type="hidden" id="listing_id" name="listing_id" value="{{listing.id}}">
+                        <input type="submit" value="Remove From Watch List" class="btn btn-secondary" >
+                    </form>
+                    {% else %} 
+                    <form method="post" action="{% url 'add_watch_list' %}">
+                        {% csrf_token %}
+                        <input type="hidden" id="listing_id" name="listing_id" value="{{listing.id}}">
+                        <input type="submit" value="Add To Watch List TEST" class="btn btn-secondary" >
+                    </form>
+                    {% endif %}
+                    
+                </div>
+            </div>
+        </div>
+
+
+
+        <!-- Image Section -->
+        <div class="row mb-4">
+            <div class="col-12" style="height: 530px;">
+                <img src="{{ listing.image_url }}" 
+                    alt="{{ listing.title }}" 
+                    class="w-100 h-100 rounded shadow" 
+                    style="object-fit: cover;">
+            </div>
+        </div>
+
+        <!-- Pricing and Bids Section -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <p class="fs-4 mb-2">
+                    <strong>Current Price:</strong> 
+                        {% if bid_price %}
+                            <span class="text-success">${{ bid_price }}</span>
+                        {% else %}
+                            <span class="text-success">${{ listing.price }}</span>
+                        {% endif %}
+
+                    
+                </p>
+            </div>
+            <div class="col-md-4">
+                <p class="fs-4 mb-2">
+                    <strong>Bids:</strong> <span class="text-primary">{{ bid_count }}</span>
+                </p>
+            </div>
+
+            <div class="col-md-4">
+                <p class="fs-4 mb-2">
+                    <strong>Category:</strong> <span class="text-primary">{{ listing.category | title}}</span>
+                </p>
+            </div>
+        </div>
+
+        {% if isMyListing and listing.active %}
+
+        <div class="row mb-3" >
+            <div class="col-12 d-flex justify-content-center">
+                <form action="{% url 'close_listing' %}" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="listing_id" value="{{ listing.id }}">
+                    <input type="submit" value="Close Auction" class="btn btn-success" style="height: 60px;">
+                </form>
+            </div>
+        </div>
+
+        {% endif %}
+
+
+        {% if listing.active == False %}
+            <div class="row mb-3" >
+                <div class="col-12">
+                    <div class="alert alert-primary fs-4 mb-2" role="alert">
+                        {{ winner_message }}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h3 class="card-title text-primary">Description</h3>
+                        <p class="card-text fs-5 text-muted">
+                            {{ listing.description }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% if message %}
+        <div class="row mb-2">
+            <div class="col-12">
+            <div class="alert alert-primary fs-4 mb-2" role="alert">
+                {{ message }}
+            </div>
+            </div>
+        </div>
+        {% endif %}
+
+
+        {% if isMyListing == False and listing.active %}
+        <div class="row">
+            <div class="col-12">
+                <form  method="POST" action="{% url 'update_bid' %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="bid_price" class="form-label">Bid</label>
+                        <input type="hidden" name="listing_id" value="{{ listing.id }}">
+                        {{ BidForm.price }}
+                        <input type="submit" id="submit" class="btn btn-primary mt-3">
+                    </div>
+                    
+                    
+                </form>
+            </div>
+        </div>
+
+        {% endif %}
+
+
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h3 class="card-title text-success mb-2">Comments</h3>
+                        {% for comment in comments %}
+                            <p class="card-text fs-5 text-muted">
+                                {{comment.user}}: {{ comment.text }}
+                            </p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% if listing.active %}
+            <div class="row mb-4">
+                <div class="col-12">
+                    <form action="{% url 'add_comment' %}" method="post" class="d-flex">
+                        {% csrf_token %}
+                        <input type="hidden" name="listing_id" value="{{ listing.id }}">
+                        {{ CommentForm.text }}
+                        <input type="submit" value="Add" class="btn btn-secondary d-sm-block">
+                    </form>
+                </div>
+            </div>
+        {% endif %}
+
+    
+
+
+
+
+    
+    </div>
+
+
+{% endblock %}
